@@ -25,13 +25,16 @@ const handleSetTheLunchRestaurant = async event => {
         return Lex.confirmIntent({ intentName, slots, message });
     }
 
-
-    let [err, lunchOrder] = await to(DB.get("ID", event.date, 'lunch-order'));
+    let currentDate = new Date;
+    let web = currentDate.getDate() - currentDate.getDay() + 9;
+    let upcomingWeb = new Date(currentDate.setDate(web));
+    let upcomingWebDate = upcomingWeb.getFullYear() + '-' + (upcomingWeb.getMonth() + 1) + '-' + upcomingWeb.getDate();
+    let [err, lunchOrder] = await to(DB.get("ID", upcomingWebDate, 'lunch-order'));
     if (!lunchOrder) {
-        lunchOrder = { ID: event.date, Items: [], name: uuidv4(), TTL: 0 };
+        lunchOrder = { ID: upcomingWebDate, Items: [], name: uuidv4(), TTL: 0 };
     }
     let updatedLunchOrder = { ...lunchOrder, userID: event.userId, Items: [...lunchOrder.Items, menuURLs], TTL: Date.now() + 7 * 24 * 60 * 60 * 1000 };
-    let [writeErr, res] = await to(DB.write(event.date, updatedLunchOrder, 'lunch-order'));
+    let [writeErr, res] = await to(DB.write(upcomingWebDate, updatedLunchOrder, 'lunch-order'));
     if (writeErr) {
         let message = `Unfortunately we've had an error on our system and we can't add this to our lunch order.`;
         return Lex.close({ message });

@@ -1,7 +1,7 @@
 const AWS = require('aws-sdk');
 
 let documentClient = new AWS.DynamoDB.DocumentClient({
-    'region': 'es-west-1'
+    'region': 'us-east-1'
 });
 
 module.exports = class DB {
@@ -13,7 +13,7 @@ module.exports = class DB {
             if (!table) throw 'table name is needed';
             if (typeof table !== 'string') throw `the table name must be a string and not ${table}`
 
-            let params = {
+            let params = { 
                 TableName: table,
                 Item: { ...data, ID: ID }
             };
@@ -34,7 +34,7 @@ module.exports = class DB {
         if (!table) throw 'table needed';
         if (typeof key !== 'string') throw `key was not string and was ${JSON.stringify(key)} on table ${table}`;
         if (typeof value !== 'string') throw `value was not string and was ${JSON.stringify(value)} on table ${table}`;
-        if (!table) 'table needs to be users, sessions, or routes.'
+        if (!table) throw 'table needs to be users, sessions, or routes.'
         return new Promise((resolve, reject) => {
             let params = {
                 TableName: table,
@@ -48,6 +48,7 @@ module.exports = class DB {
                     return reject(err);
                 }
                 //TODO check only one Item.
+                console.log(`There was an error fetching the data for dung`, data.Item);
                 return resolve(data.Item);
             });
         });

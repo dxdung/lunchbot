@@ -1,5 +1,4 @@
 module.exports = class Lex {
-
     elicitSlot({ sessionAttributes = {}, message, intentName, slotToElicit, slots }) {
         return {
             sessionAttributes,
